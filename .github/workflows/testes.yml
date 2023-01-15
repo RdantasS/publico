@@ -1,0 +1,25 @@
+name: Workflow_test
+
+on:
+  push:
+    branches: [main, staging, trying]
+  pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+
+      - name: Get_Envs
+        run: |
+          curl -s --location --request POST 'https://wiki.polymorph.id/graphql' --header "Authorization: Bearer ${{ secrets.WIKI_API_TOKEN }}" --header 'Content-Type: application/json' --data-raw '{"query":"{\r\n  pages {\r\n    single (id: 71) {\r\n      content\r\n    }\r\n  }\r\n}","variables":{}}' |  jq -r ".data.pages.single.content" > .env
+          cat .env
+
+
